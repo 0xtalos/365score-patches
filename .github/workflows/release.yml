@@ -56,12 +56,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          ./gradlew :patches:buildAndroid -Pversion=1.0.0 --stacktrace --no-daemon
+          ./gradlew :patches:buildAndroid -Pversion=1.1.0 --stacktrace --no-daemon
           echo "Build finished. Directory contents:"
           ls -la patches/build/libs/
           for f in patches/build/libs/*.mpp; do
-            if [ -f "$f" ] && [ "$f" != "patches/build/libs/patches-1.0.0.mpp" ]; then
-              cp "$f" patches/build/libs/patches-1.0.0.mpp
+            if [ -f "$f" ] && [ "$f" != "patches/build/libs/patches-1.1.0.mpp" ]; then
+              cp "$f" patches/build/libs/patches-1.1.0.mpp
             fi
           done
 
@@ -71,14 +71,14 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           else
-            echo "version=v1.0.0" >> $GITHUB_OUTPUT
+            echo "version=v1.1.0" >> $GITHUB_OUTPUT
           fi
 
       - name: Create or Update Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          name: "365Score Patches ${{ steps.version.outputs.version }}"
+          name: "365Score & TikTok Patches ${{ steps.version.outputs.version }}"
           draft: false
           prerelease: false
           generate_release_notes: true
