@@ -23,13 +23,13 @@ internal fun addLegacySettingsEntryFallback() {
 
         fun String.toClassName(): String = substring(1, length - 1).replace("/", ".")
 
+        val addSettingsMethod = AddSettingsEntryFingerprint.methodOrNull ?: return
+        if (SettingsEntryFingerprint.methodOrNull == null || SettingsEntryInfoFingerprint.methodOrNull == null) return
+
         val settingsButtonClass = SettingsEntryFingerprint.originalClassDef.type.toClassName()
         val settingsButtonInfoClass = SettingsEntryInfoFingerprint.originalClassDef.type.toClassName()
 
-        // If this optional secondary row fingerprint does not match, skip it instead of failing the patch run.
-        // If fingerprints don't match, skip instead of failing the whole patch run.
-        AddSettingsEntryFingerprint.methodOrNull?.let { addSettingsMethod ->
-            val implementation = addSettingsMethod.implementation ?: return@let
+        val implementation = addSettingsMethod.implementation ?: return
             val markIndex = implementation.instructions.indexOfFirst {
                 it.opcode == Opcode.IGET_OBJECT &&
                     (it as? Instruction22c)?.reference?.let { ref -> ref is FieldReference && ref.name == "headerUnit" } == true
@@ -52,6 +52,4 @@ internal fun addLegacySettingsEntryFallback() {
                     check-cast v0, ${SettingsEntryFingerprint.originalClassDef.type}
                 """,
             )
-        }
-
 }

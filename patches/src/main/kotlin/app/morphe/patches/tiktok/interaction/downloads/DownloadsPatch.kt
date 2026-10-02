@@ -112,7 +112,7 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Add local gallery saving to the comment sticker/image preview sheet.
-        StickerPreviewBinderFingerprint.method.apply {
+        StickerPreviewBinderFingerprint.methodOrNull?.apply {
             val returnIndex = findInstructionIndicesReversedOrThrow { opcode == Opcode.RETURN_VOID }.first()
             addInstructions(
                 returnIndex,
@@ -123,51 +123,42 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Preserve the full StickerItem behind TikTok's reduced preview model for media detection.
-        StickerPreviewSourceFingerprint.method.apply {
-            val bindCallIndices = implementation!!.instructions.withIndex()
-                .filter { (_, instruction) ->
+        StickerPreviewSourceFingerprint.methodOrNull?.apply {
+            val bindCallIndices = implementation?.instructions?.withIndex()
+                ?.filter { (_, instruction) ->
                     instruction.getReference<MethodReference>()?.let { reference ->
                         reference.definingClass == "LX/0ULN;" &&
                             reference.name == "LIZ" &&
                             reference.parameterTypes.firstOrNull() == "LX/0ULM;"
                     } == true
                 }
-                .map { it.index }
-                .toList()
+                ?.map { it.index }
+                ?.toList()
+                ?: emptyList()
 
-            if (bindCallIndices.isEmpty()) {
-                throw app.morphe.patcher.patch.PatchException(
-                    "Downloads: could not find 46.2.3 sticker preview bind calls.",
-                )
-            }
+            if (bindCallIndices.isNotEmpty()) {
+                bindCallIndices.asReversed().forEach { bindCallIndex ->
+                    val bindInstruction = implementation!!.instructions[bindCallIndex]
+                    val previewRegister = when (bindInstruction) {
+                        is FiveRegisterInstruction -> bindInstruction.registerD
+                        is RegisterRangeInstruction -> bindInstruction.startRegister + 1
+                        else -> return@forEach
+                    }
+                    val registerProvider = getFreeRegisterProvider(bindCallIndex, 2, previewRegister)
+                    val previewTempRegister = registerProvider.getFreeRegister()
+                    val sourceTempRegister = registerProvider.getFreeRegister()
 
-            bindCallIndices.asReversed().forEach { bindCallIndex ->
-                val bindInstruction = implementation!!.instructions[bindCallIndex]
-                val previewRegister = when (bindInstruction) {
-                    is FiveRegisterInstruction -> bindInstruction.registerD
-                    is RegisterRangeInstruction -> bindInstruction.startRegister + 1
-                    else -> throw app.morphe.patcher.patch.PatchException(
-                        "Downloads: unsupported sticker preview bind instruction.",
-                    )
+                    if (previewTempRegister <= 15 && sourceTempRegister <= 15) {
+                        addInstructions(
+                            bindCallIndex,
+                            """
+                                move-object/from16 v$previewTempRegister, v$previewRegister
+                                move-object/from16 v$sourceTempRegister, p2
+                                invoke-static {v$previewTempRegister, v$sourceTempRegister}, $STICKER_EXTENSION_CLASS_DESCRIPTOR->registerStickerSource(Ljava/lang/Object;Ljava/lang/Object;)V
+                            """,
+                        )
+                    }
                 }
-                val registerProvider = getFreeRegisterProvider(bindCallIndex, 2, previewRegister)
-                val previewTempRegister = registerProvider.getFreeRegister()
-                val sourceTempRegister = registerProvider.getFreeRegister()
-
-                if (previewTempRegister > 15 || sourceTempRegister > 15) {
-                    throw app.morphe.patcher.patch.PatchException(
-                        "Downloads: could not allocate low registers for sticker source association.",
-                    )
-                }
-
-                addInstructions(
-                    bindCallIndex,
-                    """
-                        move-object/from16 v$previewTempRegister, v$previewRegister
-                        move-object/from16 v$sourceTempRegister, p2
-                        invoke-static {v$previewTempRegister, v$sourceTempRegister}, $STICKER_EXTENSION_CLASS_DESCRIPTOR->registerStickerSource(Ljava/lang/Object;Ljava/lang/Object;)V
-                    """,
-                )
             }
         }
 
@@ -195,7 +186,7 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Change the download path.
-        VideoDownloadUriFingerprint.method.apply {
+        VideoDownloadUriFingerprint.methodOrNull?.apply {
             addInstructions(
                 0,
                 """
@@ -211,7 +202,7 @@ val downloadsPatch = bytecodePatch(
                 val pathRegister = getInstruction<OneRegisterInstruction>(fieldIndex).registerA
                 val builderRegister = getInstruction<FiveRegisterInstruction>(fieldIndex + 1).registerC
 
-                // Remove 'field load â†’ append â†’ "/Camera/" â†’ append' block.
+                // Remove 'field load –> append –> "/Camera/" –> append' block.
                 removeInstructions(fieldIndex, 4)
 
                 addInstructions(
@@ -225,7 +216,7 @@ val downloadsPatch = bytecodePatch(
             }
         }
 
-        PhotoDownloadUriFingerprint.method.apply {
+        PhotoDownloadUriFingerprint.methodOrNull?.apply {
             addInstructions(
                 0,
                 """
@@ -252,7 +243,7 @@ val downloadsPatch = bytecodePatch(
             }
         }
 
-        VideoLookupUriFingerprint.method.apply {
+        VideoLookupUriFingerprint.methodOrNull?.apply {
             addInstructions(
                 0,
                 """
@@ -285,7 +276,7 @@ val downloadsPatch = bytecodePatch(
             replaceInstruction(collectionIndex, "invoke-static {}, $EXTENSION_CLASS_DESCRIPTOR->getVideoCollectionUri()Landroid/net/Uri;")
         }
 
-        PhotoLookupUriFingerprint.method.apply {
+        PhotoLookupUriFingerprint.methodOrNull?.apply {
             addInstructions(
                 0,
                 """
@@ -318,7 +309,7 @@ val downloadsPatch = bytecodePatch(
             replaceInstruction(collectionIndex, "invoke-static {}, $EXTENSION_CLASS_DESCRIPTOR->getPhotoCollectionUri()Landroid/net/Uri;")
         }
 
-        VideoMediaStoreInsertFingerprint.method.apply {
+        VideoMediaStoreInsertFingerprint.methodOrNull?.apply {
             val collectionIndex = findInstructionIndicesReversedOrThrow {
                 getReference<MethodReference>()?.let { reference ->
                     reference.definingClass == "Landroid/provider/MediaStore\$Video\$Media;" && reference.name == "getContentUri"
@@ -327,7 +318,7 @@ val downloadsPatch = bytecodePatch(
             replaceInstruction(collectionIndex, "invoke-static {}, $EXTENSION_CLASS_DESCRIPTOR->getVideoCollectionUri()Landroid/net/Uri;")
         }
 
-        PhotoMediaStoreInsertFingerprint.method.apply {
+        PhotoMediaStoreInsertFingerprint.methodOrNull?.apply {
             val collectionIndex = findInstructionIndicesReversedOrThrow {
                 getReference<MethodReference>()?.let { reference ->
                     reference.definingClass == "Landroid/provider/MediaStore\$Images\$Media;" && reference.name == "getContentUri"
@@ -337,7 +328,7 @@ val downloadsPatch = bytecodePatch(
         }
 
         // Image posts use a direct media-copy helper instead of the ordinary photo wrapper.
-        ImagePostMediaCopyFingerprint.method.apply {
+        ImagePostMediaCopyFingerprint.methodOrNull?.apply {
             addInstructions(
                 0,
                 """
