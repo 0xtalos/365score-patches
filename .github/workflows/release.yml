@@ -58,10 +58,12 @@ jobs:
         run: |
           set -o pipefail
           ./gradlew :patches:buildAndroid -Pversion=1.1.0 --stacktrace --no-daemon 2>&1 | tee build.log || {
-            echo "## Gradle Build Error" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 80 build.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout -b build-failure-log
+            git add -f build.log
+            git commit -m "chore: save build failure log"
+            git push -f origin build-failure-log
             exit 1
           }
           echo "Build finished. Directory contents:"
