@@ -25,8 +25,6 @@ dependencies {
 
     // Android API stubs defined here.
     compileOnly(project(":patches:stub"))
-
-    implementation(libs.morphe.patches.library)
 }
 
 tasks {
