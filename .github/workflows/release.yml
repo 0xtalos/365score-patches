@@ -72,6 +72,13 @@ jobs:
             fi
           done
 
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+
       - name: Get version from tag or commit
         id: version
         run: |
