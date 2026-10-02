@@ -227,13 +227,16 @@ internal object AppCompatibilities {
         targets = listOf(AppTarget("25.9.2.0"), AppTarget("26.1.2.0")),
     )
 
-    /** Target: TikTok 46.2.3 global package. */
+    /** Target: TikTok 46.2.3 & 47.1.4 global package. */
     fun tiktok4623(): Array<Compatibility> = arrayOf(
         Compatibility(
             name = "TikTok",
             packageName = "com.zhiliaoapp.musically",
             appIconColor = TIKTOK_COLOR,
-            targets = listOf(AppTarget("46.2.3")),
+            targets = listOf(
+                AppTarget("46.2.3"),
+                AppTarget("47.1.4"),
+            ),
         ),
     )
 

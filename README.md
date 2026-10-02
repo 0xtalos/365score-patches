@@ -3,7 +3,7 @@
 <h1>365Score & TikTok Morphe Patches</h1>
 
 Morphe patches for <strong>365Scores</strong> and <strong>TikTok</strong><br>
-<em>(com.scores365 · v14.9.5+) & (com.zhiliaoapp.musically · v46.2.3)</em>
+<em>(com.scores365 · v14.9.5+) & (com.zhiliaoapp.musically · v46.2.3, v47.1.4+)</em>
 
 </div>
 
@@ -35,7 +35,7 @@ Then select your app (365Scores or TikTok) in Morphe Manager, select the APK/APK
 | **Block update screen** | Blocks the "This app is out of date" update prompt on launch |
 | **Change version code** | Changes version code to prevent Play Store from overwriting the app |
 
-### 🎵 TikTok (`com.zhiliaoapp.musically` · v46.2.3)
+### 🎵 TikTok (`com.zhiliaoapp.musically` · v46.2.3, v47.1.4)
 
 | 💊 Patch | 📜 Description |
 |----------|----------------|
