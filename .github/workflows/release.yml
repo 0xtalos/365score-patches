@@ -56,7 +56,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          ./gradlew :patches:buildAndroid -Pversion=1.1.0 --stacktrace --no-daemon
+          set -o pipefail
+          ./gradlew :patches:buildAndroid -Pversion=1.1.0 --stacktrace --no-daemon 2>&1 | tee build.log || {
+            echo "## Gradle Build Error" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 80 build.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          }
           echo "Build finished. Directory contents:"
           ls -la patches/build/libs/
           for f in patches/build/libs/*.mpp; do
