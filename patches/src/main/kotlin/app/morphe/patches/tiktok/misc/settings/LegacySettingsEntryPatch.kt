@@ -35,7 +35,7 @@ internal fun addLegacySettingsEntryFallback() {
                     (it as? Instruction22c)?.reference?.let { ref -> ref is FieldReference && ref.name == "headerUnit" } == true
             }
 
-            if (markIndex < 0) return@let
+            if (markIndex < 0) return
 
             val getUnitManager = addSettingsMethod.getInstruction(markIndex + 2)
             val addEntry = addSettingsMethod.getInstruction(markIndex + 1)
