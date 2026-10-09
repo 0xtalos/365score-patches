@@ -1,10 +1,10 @@
 group = "non7043"
-version = "1.1.2"
+version = "1.2.0"
 
 patches {
     about {
-        name = "365Score & TikTok Patches"
-        description = "Morphe patches for 365Score and TikTok"
+        name = "365Score Patches"
+        description = "Morphe patches for 365Score"
         source = "https://github.com/non7043/365score-patches"
         author = "non7043"
         contact = "na"
@@ -22,9 +22,6 @@ dependencies {
 
     // Required due to smali, or build fails. Can be removed once smali is bumped.
     implementation(libs.guava)
-
-    // Android API stubs defined here.
-    compileOnly(project(":patches:stub"))
 }
 
 tasks {
