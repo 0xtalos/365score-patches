@@ -11,13 +11,13 @@ Morphe patches for <strong>365Scores</strong><br>
 
 ### Morphe Manager
 
-[![Add to Morphe](https://img.shields.io/badge/Add%20to-Morphe-blue?logo=android&style=for-the-badge)](https://morphe.software/add-source?github=non7043/365score-patches)
+[![Add to Morphe](https://img.shields.io/badge/Add%20to-Morphe-blue?logo=android&style=for-the-badge)](https://morphe.software/add-source?github=0xtalos/365score-patches)
 
-[**➕ Click here to add Patches to Morphe Manager**](https://morphe.software/add-source?github=non7043/365score-patches)
+[**➕ Click here to add Patches to Morphe Manager**](https://morphe.software/add-source?github=0xtalos/365score-patches)
 
 Or in Morphe Manager (**Settings** / **Sources** ➔ **+**), enter:
-`https://github.com/non7043/365score-patches`
-*(or `https://raw.githubusercontent.com/non7043/365score-patches/main/patches-bundle.json`)*
+`https://github.com/0xtalos/365score-patches`
+*(or `https://raw.githubusercontent.com/0xtalos/365score-patches/main/patches-bundle.json`)*
 
 Then select 365Scores in Morphe Manager, select the APK/APKM, and tap Patch!
 

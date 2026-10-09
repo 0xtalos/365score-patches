@@ -1,14 +1,14 @@
-group = "non7043"
+group = "0xtalos"
 version = "1.2.0"
 
 patches {
     about {
         name = "365Score Patches"
         description = "Morphe patches for 365Score"
-        source = "https://github.com/non7043/365score-patches"
-        author = "non7043"
+        source = "https://github.com/0xtalos/365score-patches"
+        author = "0xtalos"
         contact = "na"
-        website = "https://github.com/non7043/365score-patches"
+        website = "https://github.com/0xtalos/365score-patches"
         license = "GNU General Public License v3.0"
     }
 }
