@@ -1,4 +1,4 @@
-package app.non7043.patches.score365.utils
+package app.morphe.patches.score365.utils
 
 /** 365Score application package name. */
 const val PACKAGE_365SCORE = "com.scores365"

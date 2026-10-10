@@ -1,6 +1,6 @@
-package app.non7043.patches.score365.premium
+package app.morphe.patches.score365.premium
 
-import app.non7043.patches.score365.utils.COMPATIBILITY_365SCORE
+import app.morphe.patches.score365.utils.COMPATIBILITY_365SCORE
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch

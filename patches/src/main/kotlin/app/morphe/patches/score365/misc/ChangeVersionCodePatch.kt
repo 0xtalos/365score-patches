@@ -1,6 +1,6 @@
-package app.non7043.patches.score365.misc
+package app.morphe.patches.score365.misc
 
-import app.non7043.patches.score365.utils.COMPATIBILITY_365SCORE
+import app.morphe.patches.score365.utils.COMPATIBILITY_365SCORE
 import app.morphe.patcher.patch.bytecodePatch
 
 /**
