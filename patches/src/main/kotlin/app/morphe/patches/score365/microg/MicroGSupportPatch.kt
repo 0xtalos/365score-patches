@@ -107,18 +107,20 @@ val microGSupportPatch = bytecodePatch(
             return null
         }
 
-        // 1. Transform GMS string references across all classes
+        // 1. Transform GMS string references across all classes (lazy mutation to minimize memory usage)
         classDefForEach { classDef ->
-            val mutableClass = mutableClassDefBy(classDef)
-            for (method in mutableClass.methods) {
-                if (method.implementation == null) continue
-                for (instruction in method.instructions) {
+            var mutableClass: app.morphe.patcher.util.proxy.mutableTypes.MutableClass? = null
+            for (method in classDef.methods) {
+                val implementation = method.implementation ?: continue
+                for ((index, instruction) in implementation.instructions.withIndex()) {
                     if (instruction.opcode == Opcode.CONST_STRING || instruction.opcode == Opcode.CONST_STRING_JUMBO) {
                         val ref = (instruction as? Instruction21c)?.reference as? StringReference ?: continue
                         val transformed = commonTransform(ref.string) ?: contentUrisTransform(ref.string) ?: continue
                         val register = instruction.registerA
-                        method.replaceInstruction(
-                            instruction.location.index,
+                        val targetClass = mutableClass ?: mutableClassDefBy(classDef).also { mutableClass = it }
+                        val mutableMethod = targetClass.methods.first { it.name == method.name && it.parameters == method.parameters }
+                        mutableMethod.replaceInstruction(
+                            index,
                             BuilderInstruction21c(
                                 instruction.opcode,
                                 register,

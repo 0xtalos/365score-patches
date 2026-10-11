@@ -57,7 +57,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             VER="${GITHUB_REF#refs/tags/}"
           else
-            VER="v1.3.0"
+            VER="v1.3.1"
           fi
           RAW_VER="${VER#v}"
           echo "version=$VER" >> $GITHUB_OUTPUT
