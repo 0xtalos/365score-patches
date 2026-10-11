@@ -51,13 +51,26 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Get version from tag or commit
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VER="${GITHUB_REF#refs/tags/}"
+          else
+            VER="v1.3.0"
+          fi
+          RAW_VER="${VER#v}"
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "raw_version=$RAW_VER" >> $GITHUB_OUTPUT
+
       - name: Build patches
         env:
           GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
           set -o pipefail
-          ./gradlew :patches:buildAndroid -Pversion=1.2.0 --stacktrace --no-daemon 2>&1 | tee build.log || {
+          VER="${{ steps.version.outputs.raw_version }}"
+          ./gradlew :patches:buildAndroid -Pversion=$VER --stacktrace --no-daemon 2>&1 | tee build.log || {
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git checkout -b build-failure-log
@@ -69,8 +82,8 @@ jobs:
           echo "Build finished. Directory contents:"
           ls -la patches/build/libs/
           for f in patches/build/libs/*.mpp; do
-            if [ -f "$f" ] && [ "$f" != "patches/build/libs/patches-1.2.0.mpp" ]; then
-              cp "$f" patches/build/libs/patches-1.2.0.mpp
+            if [ -f "$f" ] && [ "$f" != "patches/build/libs/patches-$VER.mpp" ]; then
+              cp "$f" "patches/build/libs/patches-$VER.mpp"
             fi
           done
 
@@ -80,15 +93,6 @@ jobs:
         with:
           name: build-log
           path: build.log
-
-      - name: Get version from tag or commit
-        id: version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
-            echo "version=v1.2.0" >> $GITHUB_OUTPUT
-          fi
 
       - name: Create or Update Release
         uses: softprops/action-gh-release@v2
@@ -104,4 +108,5 @@ jobs:
             patches-bundle.json
             patches-list.json
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
