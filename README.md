@@ -32,6 +32,7 @@ Then select 365Scores in Morphe Manager, select the APK/APKM, and tap Patch!
 | **Unlock premium** | Unlocks 365Score premium features (ad-free, tipster, plus, notification sounds) |
 | **Disable ads** | Removes banner and interstitial advertisements |
 | **Disable analytics** | Removes analytics and tracking SDK initialization (AppsFlyer, Firebase) |
+| **MicroG integration** | Allows Google Sign-In and account sync on non-root devices (requires ReVanced GmsCore) |
 | **Block update screen** | Blocks the "This app is out of date" update prompt on launch |
 | **Change version code** | Changes version code to prevent Play Store from overwriting the app |
 
