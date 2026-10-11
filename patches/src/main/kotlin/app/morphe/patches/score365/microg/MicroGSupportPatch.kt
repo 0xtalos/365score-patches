@@ -28,6 +28,22 @@ val microGResourcePatch = resourcePatch {
         }
 
         document("AndroidManifest.xml").use { document ->
+            val manifestNode = document.documentElement
+
+            // 1. Ensure <queries> tag exists and declares GmsCore package (critical for Android 11+ / API 30+ package visibility)
+            val queriesNodes = document.getElementsByTagName("queries")
+            val queriesElement = if (queriesNodes.length > 0) {
+                queriesNodes.item(0) as Element
+            } else {
+                val newQueries = document.createElement("queries")
+                manifestNode.appendChild(newQueries)
+                newQueries
+            }
+            val pkgElement = document.createElement("package")
+            pkgElement.setAttribute("android:name", MicroGConstants.GMS_CORE_PACKAGE_NAME)
+            queriesElement.appendChild(pkgElement)
+
+            // 2. Add spoofing metadata
             val applicationNodes = document.getElementsByTagName("application")
             if (applicationNodes.length > 0) {
                 val applicationNode = applicationNodes.item(0) as Element
@@ -55,12 +71,6 @@ val microGResourcePatch = resourcePatch {
             "com.google.android.c2dm",
             "${MicroGConstants.GMS_CORE_VENDOR_GROUP_ID}.android.c2dm",
         )
-        if (manifestText.contains("</queries>")) {
-            manifestText = manifestText.replace(
-                "</queries>",
-                "<package android:name=\"${MicroGConstants.GMS_CORE_PACKAGE_NAME}\"/></queries>",
-            )
-        }
         manifestFile.writeText(manifestText)
     }
 }
